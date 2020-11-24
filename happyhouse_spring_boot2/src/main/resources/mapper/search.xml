@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.happyhouse.model.dao.AptDao">
+
+	<select id="getApt" resultType="AptDto">
+		SELECT *
+  		FROM aptData_1
+  		WHERE ( 6371 * acos( cos( radians(coord_x) ) * cos( radians( #{lat} ) )
+          * cos( radians( #{lon} ) - radians(coord_y) )
+          + sin( radians(coord_x) ) * sin( radians( #{lat} ) ) ) ) <![CDATA[ < ]]> #{distance}*0.001
+       ORDER BY name, address;
+	</select>
+	
+	<select id="getDetail" resultType="DetailDto">
+		SELECT name, max(price) as maxPrice, min(price) as minPrice, avg(price) as avgPrice, max(aptArea) as maxArea, min(aptArea) as minArea
+  		FROM aptData_1
+  		WHERE ( 6371 * acos( cos( radians(coord_x) ) * cos( radians( #{lat} ) )
+          * cos( radians( #{lon} ) - radians(coord_y) )
+          + sin( radians(coord_x) ) * sin( radians( #{lat} ) ) ) ) <![CDATA[ < ]]> #{distance}*0.001
+		group by name
+		order by name;
+	</select>
+	
+		
+	<select id="check" resultType="TopSearchDto">
+		SELECT * 
+		FROM topSearched
+		WHERE keyword = #{keyword};
+	</select>
+	
+	<insert id="putKeyword" parameterType="String">
+		INSERT INTO topSearched(keyword, times)
+		VALUE (#{keyword}, 1);
+	</insert>
+	
+	<update id="addCount" parameterType="TopSearchDto">
+		UPDATE topSearched
+		SET times=#{times}
+		WHERE keyword = #{keyword};
+	</update>
+	
+	
+</mapper>
